@@ -1,0 +1,67 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Crossy Road</title>
+
+<link rel="stylesheet" href="./libs/jquery-ui/jquery-ui.css" />
+<link rel="stylesheet" href="./libs/colorpicker/css/colorpicker.css" />
+<link rel="stylesheet" href="./css/main.css" />
+<link rel="stylesheet" href="./css/threejsshadows.css" />
+
+<script src="./libs/jquery-3.3.1/jquery-3.3.1.js"></script>
+<script src="./libs/jquery-ui/jquery-ui.js"></script>
+
+<script src="./libs/three.js/three.js"></script>
+<script src="./libs/three.js/controls/OrbitControls.js"></script>
+<script src="./libs/colorpicker/js/colorpicker.js"></script>
+
+<script src="./libs/tween.js/tween.js"></script>
+<script src="./libs/keyframe.js/keyframe.js"></script>
+
+<script src="./libs/three.js/loaders/OBJLoader.js"></script>
+
+<script src="js/base.js"></script>
+<script src="ui.js"></script>
+
+<script type="text/javascript">
+
+	$(document).ready(
+			function() {
+
+				var canvas = document.getElementById("webglcanvas");
+
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+				// create the scene
+				createScene(canvas);
+
+        document.addEventListener("keydown", onKeyDown, false);
+        // Run the run loop
+        run();
+			}
+	);
+
+</script>
+
+</head>
+<body>
+
+<div id="container">
+    <canvas id="webglcanvas"></canvas>
+	<div id="title">
+		Crossy Road
+	</div>
+	<div id="prompt">
+
+	</div>
+</div>
+
+<div id="properties">
+  <div id="directional" class="colorSelector"></div>
+  <div id="spot" class="colorSelector"></div>
+  <div id="ambient" class="colorSelector"></div>
+</div>
+
+
+</html>
