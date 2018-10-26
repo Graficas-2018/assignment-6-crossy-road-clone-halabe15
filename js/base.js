@@ -12,6 +12,10 @@ car = null,
 group = null,
 orbitControls = null;
 
+var animated = false;
+
+var playerBox = null;
+
 var objLoader = null, jsonLoader = null;
 
 var duration = 300; // ms
@@ -47,6 +51,7 @@ function loadObj(obj, png){
           player.position.y = -4;
           // player.rotation.x = Math.PI / 180 * 15;
           // player.rotation.y = -3;
+          console.log(player);
           scene.add(player);
 
           // return object;
@@ -65,7 +70,6 @@ function loadObj(obj, png){
       });
 
 }
-
 function loadCar(obj, png){
   if(!objLoader)
       objLoader = new THREE.OBJLoader();
@@ -111,7 +115,6 @@ function loadCar(obj, png){
       });
 
 }
-
 function loadTree(obj, png){
   if(!objLoader)
       objLoader = new THREE.OBJLoader();
@@ -136,7 +139,7 @@ function loadTree(obj, png){
           } );
 
           // player = object;
-          object.scale.set(3,3,3);
+          object.scale.set(4,4,4);
           object.position.z = 5;
           object.position.x = 3;
           object.position.y = -4;
@@ -190,63 +193,51 @@ function run() {
 }
 
 function onKeyDown(event){
-  console.log(event.keyCode);
+  // console.log(event.keyCode);
   switch (event.keyCode) {
     case 65:
       // IZQ
       animations(new THREE.Vector3(1,0,0));
       player.animation.start();
-
     break;
 
     case 87:
       // ARRIBA
       animations(new THREE.Vector3(0,0,1));
       player.animation.start();
-
     break;
 
     case 68:
       // DER
       animations(new THREE.Vector3(-1,0,0));
       player.animation.start();
-
     break;
 
     case 83:
       // ABAJO
       animations(new THREE.Vector3(0,0,-1));
       player.animation.start();
-
     break;
 
 
   }
+
+  animated = true;
 
 
 }
 
 async function animations(vector){
     // position animation
-    if (player.animation)
-        player.animation.stop();
+    if(animated && player.animation.running)
+      return;
 
     player.animation = new KF.KeyFrameAnimator;
     player.animation.init({
         interps:
             [
-                // {
-                //     keys:[0, .25, .5, 1],
-                //     values:[
-                //             { x : 0 },
-                //             { x : -Math.PI /8 },
-                //             { x : -Math.PI /4},
-                //             { x : -Math.PI /2},
-                //             ],
-                //     target:player.position
-                // },
                 {
-                    keys:[0, .1, .2, .3],
+                    keys:[0, .25, .5, 1],
                     values:[
                             { x: player.position.x + (vector.x * 1), y : -4, z: player.position.z + (vector.z * 1) },
                             { x: player.position.x + (vector.x * 2) , y : -3, z: player.position.z + (vector.z * 2) },
@@ -257,7 +248,7 @@ async function animations(vector){
                 },
             ],
         loop: false,
-        duration:1000,
+        duration:300,
         // easing:TWEEN.Easing.Bounce.InOut,
     });
 }
@@ -333,5 +324,5 @@ function createScene(canvas) {
 
     orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
 
-    animations(new THREE.Vector3());
+    animations(new THREE.Vector3(0,0,0));
 }
