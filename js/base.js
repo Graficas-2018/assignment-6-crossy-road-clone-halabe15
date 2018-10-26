@@ -8,25 +8,25 @@ scene = null,
 camera = null,
 root = null,
 player = null,
-monster = null,
+car = null,
 group = null,
 orbitControls = null;
 
 var objLoader = null, jsonLoader = null;
 
-var duration = 20000; // ms
+var duration = 300; // ms
 var currentTime = Date.now();
 
-function loadObj(){
+function loadObj(obj, png){
   if(!objLoader)
       objLoader = new THREE.OBJLoader();
 
   objLoader.load(
-      './assets/models/characters/chicken/0.obj',
+      obj,
 
       function(object)
       {
-          var texture = new THREE.TextureLoader().load('./assets/models/characters/chicken/0.png');
+          var texture = new THREE.TextureLoader().load(png);
           // var normalMap = new THREE.TextureLoader().load('../models/cerberus/Cerberus_N.jpg');
           // var specularMap = new THREE.TextureLoader().load('../models/cerberus/Cerberus_M.jpg');
 
@@ -47,7 +47,10 @@ function loadObj(){
           player.position.y = -4;
           // player.rotation.x = Math.PI / 180 * 15;
           // player.rotation.y = -3;
-          scene.add(object);
+          scene.add(player);
+
+          // return object;
+
       },
       function ( xhr ) {
 
@@ -60,6 +63,102 @@ function loadObj(){
           console.log( 'An error happened' );
 
       });
+
+}
+
+function loadCar(obj, png){
+  if(!objLoader)
+      objLoader = new THREE.OBJLoader();
+
+  objLoader.load(
+      obj,
+
+      function(object)
+      {
+          var texture = new THREE.TextureLoader().load(png);
+
+          object.traverse( function ( child )
+          {
+              if ( child instanceof THREE.Mesh )
+              {
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                  child.material.map = texture;
+              }
+          } );
+
+          car = object;
+          car.scale.set(5,5,5);
+          car.rotation.y = -Math.PI/2;
+          car.position.z = 15;
+          car.position.x = 25;
+          car.position.y = -4;
+          scene.add(car);
+
+          // return object;
+
+      },
+      function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+          console.log( 'An error happened' );
+
+      });
+
+}
+
+function loadTree(obj, png){
+  if(!objLoader)
+      objLoader = new THREE.OBJLoader();
+
+  objLoader.load(
+      obj,
+
+      function(object)
+      {
+          var texture = new THREE.TextureLoader().load(png);
+          // var normalMap = new THREE.TextureLoader().load('../models/cerberus/Cerberus_N.jpg');
+          // var specularMap = new THREE.TextureLoader().load('../models/cerberus/Cerberus_M.jpg');
+
+          object.traverse( function ( child )
+          {
+              if ( child instanceof THREE.Mesh )
+              {
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                  child.material.map = texture;
+              }
+          } );
+
+          // player = object;
+          object.scale.set(3,3,3);
+          object.position.z = 5;
+          object.position.x = 3;
+          object.position.y = -4;
+          // player.rotation.x = Math.PI / 180 * 15;
+          // player.rotation.y = -3;
+          scene.add(object);
+
+          // return object;
+
+      },
+      function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+          console.log( 'An error happened' );
+
+      });
+
 }
 
 function animate() {
@@ -68,13 +167,12 @@ function animate() {
     var deltat = now - currentTime;
     currentTime = now;
     var fract = deltat / duration;
-    var angle = Math.PI * 2 * fract;
+    var velocity = Math.PI * 2 * fract;
 
-    if(player)
-        player.rotation.y += angle / 2;
+    car.position.x -= velocity;
 
-    if(monster)
-        monster.rotation.y += angle / 2;
+    if(car.position.x < -25 )
+      car.position.x = 25;
 }
 
 function run() {
@@ -84,7 +182,7 @@ function run() {
         renderer.render( scene, camera );
 
         // Spin the cube for next frame
-        // animate();
+        animate();
         KF.update();
 
         // Update the camera controller
@@ -98,28 +196,28 @@ function onKeyDown(event){
       // IZQ
       animations(new THREE.Vector3(1,0,0));
       player.animation.start();
-      
+
     break;
 
     case 87:
       // ARRIBA
       animations(new THREE.Vector3(0,0,1));
       player.animation.start();
-      
+
     break;
 
     case 68:
       // DER
       animations(new THREE.Vector3(-1,0,0));
       player.animation.start();
-      
+
     break;
 
     case 83:
       // ABAJO
       animations(new THREE.Vector3(0,0,-1));
       player.animation.start();
-      
+
     break;
 
 
@@ -189,7 +287,8 @@ function createScene(canvas) {
 
     // Add  a camera so we can view the scene
     camera = new THREE.PerspectiveCamera( 45, canvas.width / canvas.height, 1, 4000 );
-    camera.position.set(-2, 6, 12);
+    camera.position.set(-10, 10, -10);
+    // camera.rotation.set(30, 30, 30);
     scene.add(camera);
 
     // Create a group to hold all the objects
@@ -201,7 +300,10 @@ function createScene(canvas) {
     root.add(ambientLight);
 
     // Create the objects
-    loadObj();
+    loadObj('./assets/models/characters/chicken/0.obj', './assets/models/characters/chicken/0.png');
+    loadTree('./assets/models/environment/tree/3/0.obj', './assets/models/environment/tree/3/0.png');
+    loadCar('./assets/models/vehicles/blue_car/0.obj', './assets/models/vehicles/blue_car/0.png');
+    // loadObj('./assets/models/characters/chicken/0.obj');
 
     // Create a group to hold the objects
     group = new THREE.Object3D;
