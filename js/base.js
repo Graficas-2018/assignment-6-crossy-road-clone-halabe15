@@ -14,7 +14,9 @@ orbitControls = null;
 
 var animated = false;
 
-var playerBox = null;
+var playerBBox = null;
+var treeBBox = null;
+var carBBox = null;
 
 var objLoader = null, jsonLoader = null;
 
@@ -69,6 +71,7 @@ function loadObj(obj, png){
 
       });
 
+    playerBBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 }
 function loadCar(obj, png){
   if(!objLoader)
@@ -94,7 +97,7 @@ function loadCar(obj, png){
           car = object;
           car.scale.set(5,5,5);
           car.rotation.y = -Math.PI/2;
-          car.position.z = 15;
+          car.position.z = 9;
           car.position.x = 25;
           car.position.y = -4;
           scene.add(car);
@@ -114,10 +117,15 @@ function loadCar(obj, png){
 
       });
 
+      carBBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+
+
 }
 function loadTree(obj, png){
   if(!objLoader)
       objLoader = new THREE.OBJLoader();
+
+  treeBBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 
   objLoader.load(
       obj,
@@ -145,6 +153,8 @@ function loadTree(obj, png){
           object.position.y = -4;
           // player.rotation.x = Math.PI / 180 * 15;
           // player.rotation.y = -3;
+          treeBBox.setFromObject(object);
+
           scene.add(object);
 
           // return object;
@@ -161,6 +171,7 @@ function loadTree(obj, png){
           console.log( 'An error happened' );
 
       });
+
 
 }
 
@@ -179,17 +190,26 @@ function animate() {
 }
 
 function run() {
-    requestAnimationFrame(function() { run(); });
+  requestAnimationFrame(function() { run(); });
 
-        // Render the scene
-        renderer.render( scene, camera );
+  // Render the scene
+  renderer.render( scene, camera );
 
-        // Spin the cube for next frame
-        animate();
-        KF.update();
+  // Spin the cube for next frame
+  animate();
+  KF.update();
 
-        // Update the camera controller
-        orbitControls.update();
+  // Update the camera controller
+  orbitControls.update();
+
+  playerBBox.setFromObject(player)
+  carBBox.setFromObject(car)
+
+  if(carBBox.containsPoint(player.position)){
+    player.animation.stop();
+    player.position.set(0,-4,0);
+  }
+  // playerBBox.setFromObject(player)
 }
 
 function onKeyDown(event){
@@ -197,24 +217,59 @@ function onKeyDown(event){
   switch (event.keyCode) {
     case 65:
       // IZQ
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x+1, player.position.y, player.position.z)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x+2, player.position.y, player.position.z)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x+3, player.position.y, player.position.z)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x+4, player.position.y, player.position.z)))
+        break;
+
+      // console.log(new THREE.Vector3(player.position.x+4, player.position.y, player.position.z));
+      // console.log(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z)));
       animations(new THREE.Vector3(1,0,0));
       player.animation.start();
     break;
 
     case 87:
       // ARRIBA
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+1)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+2)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+3)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+4)))
+        break;
       animations(new THREE.Vector3(0,0,1));
       player.animation.start();
     break;
 
     case 68:
       // DER
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x-1, player.position.y, player.position.z)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x-2, player.position.y, player.position.z)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x-3, player.position.y, player.position.z)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x-4, player.position.y, player.position.z)))
+        break;
       animations(new THREE.Vector3(-1,0,0));
       player.animation.start();
     break;
 
     case 83:
       // ABAJO
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-1)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-2)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-3)))
+        break;
+      if(treeBBox.containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-4)))
+        break;
       animations(new THREE.Vector3(0,0,-1));
       player.animation.start();
     break;
@@ -223,7 +278,7 @@ function onKeyDown(event){
   }
 
   animated = true;
-
+  console.log(playerBBox);
 
 }
 
