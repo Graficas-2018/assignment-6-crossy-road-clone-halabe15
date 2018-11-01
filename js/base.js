@@ -381,8 +381,6 @@ function run() {
       }
       if (drawn) {
         resetPlayer();
-      } else {
-        // player.position.x = logBBox[i].position.x;
       }
     }
   }
@@ -399,7 +397,6 @@ function run() {
   for (var element in logBBox) {
     logBBox[element].setFromObject(logs.children[element])
     if(logBBox[element].containsPoint(player.position)){
-      // console.log(logs.children[element].position);
       player.position.x = logs.children[element].position.x;
     }
   }
@@ -636,6 +633,7 @@ function resetPlayer(){
   player.position.set(0,-2.8,2);
   $('#animations').text('Score: 0');
   fowardPosition = 1;
+  bestScore = 0;
 }
 
 function addScore(){
@@ -643,5 +641,4 @@ function addScore(){
     bestScore = fowardPosition - 1;
     $('#animations').text('Score: '+bestScore);
   }
-
 }
