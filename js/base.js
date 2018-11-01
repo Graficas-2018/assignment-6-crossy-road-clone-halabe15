@@ -84,7 +84,6 @@ function loadPaths(order, obj, png){
 
     playerBBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 }
-
 function loadObj(obj, png){
   if(!objLoader)
       objLoader = new THREE.OBJLoader();
@@ -187,7 +186,7 @@ function loadCar(obj, png, i){
 
 
 }
-function loadLogs(obj, png, i){
+function loadLogs(obj, png, i, pos){
   if(!objLoader)
       objLoader = new THREE.OBJLoader();
 
@@ -214,7 +213,7 @@ function loadLogs(obj, png, i){
           log.scale.set(4,4,4);
           // log.rotation.y = -Math.PI/2;
           log.position.z = (i * 4) - 2;
-          log.position.x = 35;
+          log.position.x = 35 + pos;
           log.position.y = -5;
           log.name = (i * 4) - 2;
           logs.add(log);
@@ -224,7 +223,7 @@ function loadLogs(obj, png, i){
       },
       function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
       },
       // called when loading has errors
@@ -304,10 +303,10 @@ function loadTree(obj, png){
 
 function animate() {
 
-  var duration1 = 800;
-  var duration2 = 650;
-  var duration3 = 600;
-  var duration4 = 400;
+  var duration1 = 1000;
+  var duration2 = 800;
+  var duration3 = 700;
+  var duration4 = 500;
   var now = Date.now();
   var deltat = now - currentTime;
   currentTime = now;
@@ -395,10 +394,20 @@ function run() {
   }
 
   for (var element in logBBox) {
+    // console.log(logs.children[element].position.x);
+    if(logs.children[element].position.x > 35){
+      logs.children[element].visible = false;
+    } else {
+      logs.children[element].visible = true;
+    }
     logBBox[element].setFromObject(logs.children[element])
     if(logBBox[element].containsPoint(player.position)){
       player.position.x = logs.children[element].position.x;
     }
+  }
+
+  if (player.position.x > 35 || player.position.x < -36 || player.position.z > 204 || player.position.z == -6) {
+    resetPlayer();
   }
 }
 
@@ -599,7 +608,9 @@ function createScene(canvas) {
       if (rand == 0 || rand == 1) {
         loadCar('./assets/models/vehicles/blue_car/0.obj', './assets/models/vehicles/blue_car/0.png', i);
       } else if (rand == 4) {
-        loadLogs('./assets/models/environment/log/0/0.obj', './assets/models/environment/log/0/0.png', i);
+        loadLogs('./assets/models/environment/log/0/0.obj', './assets/models/environment/log/0/0.png', i, 0);
+        loadLogs('./assets/models/environment/log/1/0.obj', './assets/models/environment/log/1/0.png', i, 10);
+        loadLogs('./assets/models/environment/log/0/0.obj', './assets/models/environment/log/0/0.png', i, 25);
       }
     }
 
