@@ -263,12 +263,15 @@ function loadTree(obj, png){
           } );
 
           // player = object;
-          var x;
+          var x, rand;
           do {
             x = random(-36,36);
           } while (x % 4 != 0);
 
-          var rand = Math.floor(Math.random()*grassPosition.length);
+          do {
+            rand = Math.floor(Math.random()*grassPosition.length);
+          } while (rand == 1);
+
 
           object.scale.set(4,4,4);
           object.position.z = (grassPosition[rand]*4)-2;
@@ -568,6 +571,8 @@ function createScene(canvas) {
         './assets/models/environment/river/0.png'
       ];
       rand = Math.floor(Math.random()*(4-0+1)+0);
+      if(i < 2)
+        rand = 2;
       if (rand == 0 || rand == 1) {
         roadsPosition.push(i);
         pathsPositions.push('road');
