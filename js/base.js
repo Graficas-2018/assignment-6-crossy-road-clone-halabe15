@@ -33,7 +33,7 @@ var logBBox = [];
 var objLoader = null, jsonLoader = null;
 
 var currentTime = Date.now();
-var fowardPosition = null;
+var fowardPosition = 1;
 var bestScore = 0;
 
 
@@ -136,7 +136,7 @@ function loadObj(obj, png){
 
     playerBBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 }
-function loadCar(obj, png){
+function loadCar(obj, png, i){
   if(!objLoader)
       objLoader = new THREE.OBJLoader();
 
@@ -162,7 +162,7 @@ function loadCar(obj, png){
           car = object;
           car.scale.set(4,4,4);
           car.rotation.y = -Math.PI/2;
-          car.position.z = (roadsPosition[rand] * 4) - 2;
+          car.position.z = (i * 4) - 2;
           car.position.x = 35;
           car.position.y = -3.3;
           car.name = carBBox.length - 1;
@@ -216,7 +216,7 @@ function loadLogs(obj, png, i){
           log.position.z = (i * 4) - 2;
           log.position.x = 35;
           log.position.y = -5;
-          log.name = logBBox.length - 1;
+          log.name = (i * 4) - 2;
           logs.add(log);
 
           // return object;
@@ -304,9 +304,9 @@ function loadTree(obj, png){
 
 function animate() {
 
-  var duration1 = 550;
-  var duration2 = 500;
-  var duration3 = 450;
+  var duration1 = 800;
+  var duration2 = 650;
+  var duration3 = 600;
   var duration4 = 400;
   var now = Date.now();
   var deltat = now - currentTime;
@@ -360,22 +360,29 @@ function run() {
 
   addScore();
 
-  if (pathsPositions[fowardPosition] != undefined && player.animation.running == false) {
+  if (player.animation.running == false) {
     if (pathsPositions[fowardPosition] == 'road') {
+      // $('#prompt').text(fowardPosition);
       player.position.y = -3.3;
     } else if (pathsPositions[fowardPosition] == 'grass') {
+      // $('#prompt').text(fowardPosition);
       player.position.y = -2.8;
     } else if (pathsPositions[fowardPosition] == 'river') {
+      // $('#prompt').text(fowardPosition);
       player.position.y = -3.05;
       var drawn = true;
       for (var i in logBBox) {
         if (logBBox[i].containsPoint(player.position)) {
           drawn = false;
           break;
+          // resetPlayer();
+          // console.log(logBBox[i].containsPoint(player.position));
         }
       }
       if (drawn) {
         resetPlayer();
+      } else {
+        // player.position.x = logBBox[i].position.x;
       }
     }
   }
@@ -388,6 +395,14 @@ function run() {
       resetPlayer();
     }
   }
+
+  for (var element in logBBox) {
+    logBBox[element].setFromObject(logs.children[element])
+    if(logBBox[element].containsPoint(player.position)){
+      // console.log(logs.children[element].position);
+      player.position.x = logs.children[element].position.x;
+    }
+  }
 }
 
 function onKeyDown(event){
@@ -396,13 +411,13 @@ function onKeyDown(event){
     case 65:
       var crash = false;
       for (var i in treeBBox) {
-        // IZQ
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x+1, player.position.y, player.position.z)))
-          {crash = true; break;} else
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x+2, player.position.y, player.position.z)))
-          {crash = true; break;} else
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x+3, player.position.y, player.position.z)))
-          {crash = true; break;} else
+        // // IZQ
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x+1, player.position.y, player.position.z)))
+        //   {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x+2, player.position.y, player.position.z)))
+        //   {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x+3, player.position.y, player.position.z)))
+        //   {crash = true; break;} else
         if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x+4, player.position.y, player.position.z)))
           {crash = true; break;}
       }
@@ -417,12 +432,12 @@ function onKeyDown(event){
     case 87:
       for (var i in treeBBox) {
         // ARRIBA
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+1)))
-          {crash = true; break;} else
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+2)))
-          {crash = true; break;} else
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+3)))
-          {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+1)))
+        //   {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+2)))
+        //   {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+3)))
+        //   {crash = true; break;} else
         if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z+4)))
           {crash = true; break;}
       }
@@ -438,12 +453,12 @@ function onKeyDown(event){
     case 68:
       for (var i in treeBBox) {
         // DER
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x-1, player.position.y, player.position.z)))
-          {crash = true; break;} else
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x-2, player.position.y, player.position.z)))
-          {crash = true; break;} else
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x-3, player.position.y, player.position.z)))
-          {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x-1, player.position.y, player.position.z)))
+        //   {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x-2, player.position.y, player.position.z)))
+        //   {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x-3, player.position.y, player.position.z)))
+        //   {crash = true; break;} else
         if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x-4, player.position.y, player.position.z)))
           {crash = true; break;}
       }
@@ -458,12 +473,12 @@ function onKeyDown(event){
     case 83:
       for (var i in treeBBox) {
         // ABAJO
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-1)))
-          {crash = true; break;} else
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-2)))
-          {crash = true; break;} else
-        if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-3)))
-          {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-1)))
+        //   {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-2)))
+        //   {crash = true; break;} else
+        // if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-3)))
+        //   {crash = true; break;} else
         if(treeBBox[i].containsPoint(new THREE.Vector3(player.position.x, player.position.y, player.position.z-4)))
           {crash = true; break;}
       }
@@ -584,7 +599,9 @@ function createScene(canvas) {
         pathsPositions.push('river');
       }
       loadPaths(i, obj[rand], png[rand]);
-      if (rand == 4) {
+      if (rand == 0 || rand == 1) {
+        loadCar('./assets/models/vehicles/blue_car/0.obj', './assets/models/vehicles/blue_car/0.png', i);
+      } else if (rand == 4) {
         loadLogs('./assets/models/environment/log/0/0.obj', './assets/models/environment/log/0/0.png', i);
       }
     }
@@ -595,7 +612,6 @@ function createScene(canvas) {
     for (var i = 0; i < rand; i++) {
       let type = random(0,3);
       loadTree('./assets/models/environment/tree/'+type+'/0.obj', './assets/models/environment/tree/'+type+'/0.png');
-      loadCar('./assets/models/vehicles/blue_car/0.obj', './assets/models/vehicles/blue_car/0.png');
     }
     // loadObj('./assets/models/characters/chicken/0.obj');
 
@@ -619,6 +635,7 @@ function resetPlayer(){
   player.animation.stop();
   player.position.set(0,-2.8,2);
   $('#animations').text('Score: 0');
+  fowardPosition = 1;
 }
 
 function addScore(){
