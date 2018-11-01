@@ -34,6 +34,7 @@ var objLoader = null, jsonLoader = null;
 
 var currentTime = Date.now();
 var fowardPosition = null;
+var bestScore = 0;
 
 
 function loadPaths(order, obj, png){
@@ -186,7 +187,7 @@ function loadCar(obj, png){
 
 
 }
-function loadLogs(obj, png){
+function loadLogs(obj, png, i){
   if(!objLoader)
       objLoader = new THREE.OBJLoader();
 
@@ -212,7 +213,7 @@ function loadLogs(obj, png){
           log = object;
           log.scale.set(4,4,4);
           // log.rotation.y = -Math.PI/2;
-          log.position.z = (riversPosition[rand] * 4) - 2;
+          log.position.z = (i * 4) - 2;
           log.position.x = 35;
           log.position.y = -5;
           log.name = logBBox.length - 1;
@@ -300,10 +301,10 @@ function loadTree(obj, png){
 
 function animate() {
 
-  var duration1 = 100;
-  var duration2 = 150;
-  var duration3 = 200;
-  var duration4 = 250;
+  var duration1 = 550;
+  var duration2 = 500;
+  var duration3 = 450;
+  var duration4 = 400;
   var now = Date.now();
   var deltat = now - currentTime;
   currentTime = now;
@@ -329,7 +330,12 @@ function animate() {
   }
 
   for (var i in logs.children) {
-    logs.children[i].position.x -= velocity;
+
+    rand = random(1,10);
+    if(rand < 5)
+      logs.children[i].position.x -= velocity1;
+    else
+      logs.children[i].position.x -= velocity2;
 
     if(logs.children[i].position.x < -35 )
       logs.children[i].position.x = 35;
@@ -349,6 +355,8 @@ function run() {
   // Update the camera controller
   orbitControls.update();
 
+  addScore();
+
   if (pathsPositions[fowardPosition] != undefined && player.animation.running == false) {
     if (pathsPositions[fowardPosition] == 'road') {
       player.position.y = -3.3;
@@ -356,6 +364,16 @@ function run() {
       player.position.y = -2.8;
     } else if (pathsPositions[fowardPosition] == 'river') {
       player.position.y = -3.05;
+      var drawn = true;
+      for (var i in logBBox) {
+        if (logBBox[i].containsPoint(player.position)) {
+          drawn = false;
+          break;
+        }
+      }
+      if (drawn) {
+        resetPlayer();
+      }
     }
   }
 
@@ -364,8 +382,7 @@ function run() {
   for (var element in carBBox) {
     carBBox[element].setFromObject(cars.children[element])
     if(carBBox[element].containsPoint(player.position)){
-      player.animation.stop();
-      player.position.set(0,-3.3,2);
+      resetPlayer();
     }
   }
 }
@@ -433,7 +450,6 @@ function onKeyDown(event){
 
       animations(new THREE.Vector3(-1,0,0));
       player.animation.start();
-      fowardPosition--;
     break;
 
     case 83:
@@ -454,6 +470,8 @@ function onKeyDown(event){
 
       animations(new THREE.Vector3(0,0,-1));
       player.animation.start();
+      fowardPosition--;
+
     break;
 
 
@@ -561,6 +579,9 @@ function createScene(canvas) {
         pathsPositions.push('river');
       }
       loadPaths(i, obj[rand], png[rand]);
+      if (rand == 4) {
+        loadLogs('./assets/models/environment/log/0/0.obj', './assets/models/environment/log/0/0.png', i);
+      }
     }
 
     rand = random(10, 100);
@@ -570,7 +591,6 @@ function createScene(canvas) {
       let type = random(0,3);
       loadTree('./assets/models/environment/tree/'+type+'/0.obj', './assets/models/environment/tree/'+type+'/0.png');
       loadCar('./assets/models/vehicles/blue_car/0.obj', './assets/models/vehicles/blue_car/0.png');
-      loadLogs('./assets/models/environment/log/0/0.obj', './assets/models/environment/log/0/0.png');
     }
     // loadObj('./assets/models/characters/chicken/0.obj');
 
@@ -588,4 +608,18 @@ function createScene(canvas) {
 
 function random(min, max){
   return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+function resetPlayer(){
+  player.animation.stop();
+  player.position.set(0,-2.8,2);
+  $('#animations').text('Score: 0');
+}
+
+function addScore(){
+  if(bestScore < fowardPosition - 1){
+    bestScore = fowardPosition - 1;
+    $('#animations').text('Score: '+bestScore);
+  }
+
 }
